@@ -11,45 +11,41 @@ export default class Contracts extends Component {
     search: "",
     checkMale: true,
     checkFemale: true,
-    checkUnknown: true
+    checkUnknown: true,
   };
-  findContact = e => {
+  findContact = (e) => {
     this.setState({ search: e.target.value });
   };
-  checkHamdler = e => {
+  checkHamdler = (e) => {
     this.setState({ [e.target.name]: e.target.checked }, this.filterContacts);
+  };
+  checkGender = (arr, check, genderCheck) => {
+    if (check) {
+      return (arr = [
+        ...arr,
+        this.state.contacts.filter((item) => item.gender === genderCheck),
+      ]);
+    } else {
+      return arr;
+    }
   };
   filterContacts = () => {
     let tempArray = [];
-
-    if (this.state.checkMale === true) {
-      tempArray = [
-        ...tempArray,
-        this.state.contacts.filter(item => item.gender === "male")
-      ];
-    }
-    if (this.state.checkFemale === true) {
-      tempArray = [
-        ...tempArray,
-        this.state.contacts.filter(item => item.gender === "female")
-      ];
-    }
-    if (this.state.checkUnknown === true) {
-      tempArray = [
-        ...tempArray,
-        this.state.contacts.filter(item => !item.gender)
-      ];
-    }
+    tempArray = this.checkGender(tempArray, this.state.checkMale, "male");
+    tempArray = this.checkGender(tempArray, this.state.checkFemale, "female");
+    tempArray = this.checkGender(tempArray, this.state.checkUnknown, undefined);
     this.setState({ filteredContacts: [].concat(...tempArray) });
   };
   render() {
-    const regex = new RegExp(this.state.search.toLocaleLowerCase(), "g");
-    const filterData = this.state.filteredContacts.filter(item => {
+    let searchWord = this.state.search.toLocaleLowerCase();
+    searchWord = searchWord.replace(/[^a-zа-я0-9 ]+/g, "");
+    const regex = new RegExp(searchWord, "g");
+    const filterData = this.state.filteredContacts.filter((item) => {
       return regex.test(
         (item.firstName + " " + item.lastName + item.phone).toLowerCase()
       );
     });
-    console.log(this.state.filteredContacts);
+
     return (
       <div className="contact-list">
         <div className="contact-heading">
